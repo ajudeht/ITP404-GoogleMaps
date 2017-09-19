@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Stalk Me</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2ubVjoYB_7HTgoFKRX2GAZ2N9j5Fayz8&callback=initMap" async defer></script>
+
+    <script>
+      var map;
+      var newlatlng = { lat: -34.397, lng: 150.644 };
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: newlatlng,
+          zoom: 80
+        });
+
+
+      }
+
+function reverseGeocode(lat,lng){
+
+  var url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyD2ubVjoYB_7HTgoFKRX2GAZ2N9j5Fayz8&`;
+  var res;
+
+  return $.getJSON(url).then( (response) => response );
+
+}
+
+if ("geolocation" in navigator) {
+
+var watchID = navigator.geolocation.watchPosition(function(position) {
+
+newlatlng.lat = position.coords.latitude;
+newlatlng.lng = position.coords.longitude;
+
+let loc = new google.maps.LatLng(newlatlng.lat, newlatlng.lng);
+
+reverseGeocode(newlatlng.lat,newlatlng.lng).then((data) => {
+  let homeMarker = new google.maps.Marker({
+    map: map,
+    position: loc,
+    animation: google.maps.Animation.DROP,
+  });
+
+  let infoWindow = new google.maps.InfoWindow({
+    content: `<strong>${data.results[0].formatted_address}</strong>`,
+    position: loc,
+    pixelOffset: new google.maps.Size(0, -25)
+  });
+
+  google.maps.event.addListener(homeMarker, 'click', function(event) {
+    infoWindow.open(map);
+  });
+
+ });
+
+initMap();
+
+});
+
+} else {
+
+}
+
+</script>
+
+  </body>
+</html>
